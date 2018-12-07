@@ -14,10 +14,12 @@ public final static int departure = 2;
 public static EventList FutureEventList;
 public static Queue Customers;
 public static Random stream;
+	
+public static int seqNum;
 
 public static void main(String argv[]) {
-  MeanInterArrivalTime = 1.0; MeanServiceTime = 3.0;
-  SIGMA                = 1.41; TotalCustomers  = 50;
+  MeanInterArrivalTime = 0.0013; MeanServiceTime = 3.0;
+  SIGMA                = 1.41; TotalCustomers  = ;
   long seed            = Long.parseLong(argv[0]);
 
   stream = new Random(seed);           // initialize rng stream
@@ -50,10 +52,12 @@ public static void main(String argv[]) {
   SumResponseTime = 0;
   NumberOfDepartures = 0;
   LongService = 0;
+  seqNum = 1;
 
   // create first arrival event
-  Event evt = new Event(arrival, poisson(stream, MeanInterArrivalTime));
+  Event evt = new Event(arrival, poisson(stream, MeanInterArrivalTime), seqNum);
   FutureEventList.enqueue( evt );
+  //seqNum++??
  }
 
  public static void ProcessArrival(Event evt) {
