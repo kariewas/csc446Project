@@ -19,7 +19,7 @@ public static int seqNum;
 
 public static void main(String argv[]) {
   MeanInterArrivalTime = 0.0013; MeanServiceTime = 3.0;
-  SIGMA                = 1.41; TotalCustomers  = ;
+  SIGMA                = 1.41; TotalCustomers  = 50;
   long seed            = Long.parseLong(argv[0]);
 
   stream = new Random(seed);           // initialize rng stream
@@ -56,6 +56,7 @@ public static void main(String argv[]) {
 
   // create first arrival event
   Event evt = new Event(arrival, poisson(stream, MeanInterArrivalTime), seqNum);
+  seqNum++;
   FutureEventList.enqueue( evt );
   //seqNum++??
  }
@@ -72,7 +73,8 @@ public static void main(String argv[]) {
   if (MaxQueueLength < QueueLength) MaxQueueLength = QueueLength;
 
   // schedule the next arrival
-  Event next_arrival = new Event(arrival, Clock+poisson(stream, MeanInterArrivalTime));
+  Event next_arrival = new Event(arrival, Clock+poisson(stream, MeanInterArrivalTime), seqNum);
+  seqNum++;
   FutureEventList.enqueue( next_arrival );
   LastEventTime = Clock;
  }
@@ -84,7 +86,7 @@ public static void main(String argv[]) {
   double ServiceTime;
   // get the job at the head of the queue
   while (( ServiceTime = normal(stream, MeanServiceTime, SIGMA)) < 0 );
-  Event depart = new Event(departure,Clock+ServiceTime);
+  Event depart = new Event(departure,Clock+ServiceTime, 0);
   FutureEventList.enqueue( depart );
   NumberInService = 1;
   QueueLength--;
@@ -101,13 +103,15 @@ public static void ProcessDeparture(Event e) {
   // measure the response time and add to the sum
   double response = (Clock - finished.get_time());
 
+  int currSeqNum = finished.get_seqNum();
+
   SumResponseTime += response;
   if( response > 4.0 ) LongService++; // record long service
   TotalBusy += (Clock - LastEventTime );
   NumberOfDepartures++;
   LastEventTime = Clock;
   //System.out.println("Customer " + NumberOfDepartures + " departed at " + String.format("%.2f", response));
-System.out.println("Customer " + NumberOfDepartures + " departed at " + String.format("%.2f", Clock));
+System.out.println("Customer " + NumberOfDepartures +" with seqNum= " + currSeqNum + " departed at " + String.format("%.2f", Clock));
  
 
  }
